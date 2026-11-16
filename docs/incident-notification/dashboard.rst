@@ -34,6 +34,7 @@ Due to the complexity of the screen, its different parts will be presented one b
    - **Incident Reference**: Shows only the incidents whose reference contains the text you enter.
    - **Incident status**: Shows only the **Ongoing** or only the **Closed** incidents.
    - **Significant impact**: Shows only the incidents with (**Yes**) or without (**No**) a significant impact. **Unknown**, the default, shows all incidents.
+   - **Support required from national CSIRT**: Shows only the incidents with the selected predefined answer to question reference ``8`` in their latest submitted answer. Leave the choice empty to show all incidents, including those without an answer.
    - **Sectors**: Shows only the incidents affecting the sectors you tick in the drop-down list.
 
    Click **Search** to apply the filter, or **Reset** to clear it.
@@ -64,7 +65,7 @@ Due to the complexity of the screen, its different parts will be presented one b
    those hidden by default can be displayed with the **Column settings** (see point 7).
 
    .. figure:: /_static/images/incident-notification/dashboard-04.png
-      :alt: Header of the incident list with all twelve operator columns numbered
+      :alt: Header of the incident list with all thirteen operator columns numbered
       :target: ../_static/images/incident-notification/dashboard-04.png
 
    The numbers in the table below refer to the screenshot. **Shown by default** tells whether a column is displayed
@@ -131,13 +132,17 @@ Due to the complexity of the screen, its different parts will be presented one b
         - Yes
         - The reports of the incident, the steps of its notification workflow, each with its status.
       * - 12
+        - Support required from national CSIRT
+        - Yes
+        - The latest submitted answer to question reference ``8``, including any additional text. **Not answered** means no submitted answer is available. Draft answers are not shown, and older submitted answers do not match the filter once a newer answer has been submitted.
+      * - 13
         - Actions
         - Always
         - Download the incident as a PDF report and open the access log from the **More options** menu.
           Operators can also delete the incident as long as none of its reports has been submitted;
           regulators and observers have a **Contacts** icon instead.
 
-   Except for the **Report** and **Actions** columns, each column has an up-and-down arrow beside its header.
+   Except for the **Report**, **Support required from national CSIRT** and **Actions** columns, each column has an up-and-down arrow beside its header.
    Clicking the header sorts the incidents in ascending or descending order based on that column.
    Only one column can be sorted at a time, and its arrow is shown in a darker grey.
    By default, the list is sorted by **Last update**, with the most recently updated incident at the top.

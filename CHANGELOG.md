@@ -9,6 +9,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- The incident dashboard shows the latest submitted answer to the CSIRT support question (reference `8`) in a "Support required from national CSIRT" column, with a filter for its predefined answers.
+
 ### Changed
 
 - On the security objectives dashboard, the button that starts a declaration is now "New assessment" instead of "New submission", and an empty dashboard now reads "No security objectives statements have been created yet." instead of "…submitted yet." (#934)

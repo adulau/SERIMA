@@ -397,7 +397,7 @@ name = "images/incident-notification/dashboard-04"
 # Every column an operator can display, numbered as in the column table of
 # dashboard.rst: the four hidden by default (Detection, Start and
 # Resolution date, Reference) are ticked in the column choice first. The rows
-# are hidden, with the footer they would pull up: with twelve narrow columns,
+# are hidden, with the footer they would pull up: with thirteen narrow columns,
 # the labels would cover their data.
 path = "/incidents/"
 role = "operator_admin"
@@ -425,8 +425,9 @@ annotate = [
   { selector = "th[data-sort-field='regulation']", arrow = "bottom", length = 45, label = "8" },
   { selector = "th[data-sort-field='reference']", arrow = "bottom", length = 45, label = "9" },
   { selector = "th[data-sort-field='sectors']", arrow = "bottom", length = 45, label = "10" },
-  { selector = "#incidents-table thead th:nth-last-child(2)", arrow = "bottom", length = 45, label = "11" },
-  { selector = "#incidents-table thead th:last-child", arrow = "bottom", length = 45, label = "12" },
+  { selector = "#incidents-table thead th:nth-last-child(3)", arrow = "bottom", length = 45, label = "11" },
+  { selector = "#incidents-table thead th:nth-last-child(2)", arrow = "bottom", length = 45, label = "12" },
+  { selector = "#incidents-table thead th:last-child", arrow = "bottom", length = 45, label = "13" },
 ]
 
 [[shots]]

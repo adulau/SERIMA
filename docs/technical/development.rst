@@ -32,6 +32,12 @@ Keep the theme on the branch that matches the application: ``dev`` with ``dev``,
 counterpart if it has one. A mismatch typically shows up as a ``TemplateDoesNotExist`` error.
 The ``theme`` folder is its own Git repository: commit and push theme changes from inside it.
 
+The incident dashboard and its column selector have application overrides in
+``templates/incidents/incidents_base.html`` and
+``templates/modals/incidents_dashboard_hide_columns.html`` to expose the CSIRT support answer.
+These templates take precedence over the theme. When updating the theme, carry relevant
+dashboard changes into these overrides as well.
+
 With ``DEBUG = True``, emails are written to the ``sent_emails`` folder instead of being sent,
 and two-factor authentication is not enforced, which makes local testing easier.
 

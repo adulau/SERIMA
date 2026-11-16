@@ -80,6 +80,7 @@ from .helpers import (
     save_answers,
 )
 from .models import (
+    Answer,
     Impact,
     Incident,
     IncidentWorkflow,
@@ -227,8 +228,15 @@ def get_incidents(request):
     page_number = incidents_filter_params.get("page")
     paginator = Paginator(incident_list, per_page)
     page_obj = paginator.get_page(page_number)
+    support_answers = {
+        answer.pk: answer
+        for answer in Answer.objects.filter(pk__in=[incident.csirt_support_answer_id for incident in page_obj]).prefetch_related(
+            "predefined_answers__translations"
+        )
+    }
 
     for incident in page_obj.object_list:
+        incident.csirt_support_answer = support_answers.get(incident.csirt_support_answer_id)
         incident.all_reports = []
         completed_workflows = incident.get_workflows_completed()
         all_workflows = incident.get_all_workflows()
