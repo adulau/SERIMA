@@ -6,7 +6,7 @@ from django.utils.translation import override
 
 from incidents.filters import IncidentFilter
 from incidents.models import Answer, Incident, IncidentWorkflow, PredefinedAnswer, QuestionOptions
-from incidents.tests.test_conditional_questions import create_predefined_answer
+from incidents.tests.test_conditional_questions import create_predefined_answer, create_question
 
 
 @pytest.fixture
@@ -57,6 +57,73 @@ def test_an_old_support_answer_does_not_match_after_a_new_submission(csirt_suppo
 
     assert not filtered.qs.exists()
     assert IncidentFilter(queryset=Incident.objects.all()).qs.get(pk=csirt_support.incident.pk).csirt_support_answer_id == latest.pk
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("same_report", [False, True])
+def test_submitted_support_answer_survives_reassigning_the_question_option(csirt_support, same_report):
+    submitted = submit_answer(csirt_support.incident, csirt_support.option, csirt_support.yes)
+    csirt_support.option.question = create_question("FREETEXT", "UNRELATED", "Describe the incident")
+    csirt_support.option.save()
+    if same_report:
+        Answer.objects.create(
+            incident_workflow=submitted.incident_workflow,
+            question_options=csirt_support.option,
+            answer="Unrelated later answer",
+        )
+    else:
+        submit_answer(csirt_support.incident, csirt_support.option, text="Unrelated later answer")
+
+    filtered = IncidentFilter({"csirt_support": csirt_support.yes.pk}, queryset=Incident.objects.all())
+
+    assert filtered.qs.get().csirt_support_answer_id == submitted.pk
+
+
+@pytest.mark.django_db
+def test_assigning_reference_8_does_not_expose_unrelated_historical_answers(csirt_support):
+    support_question = csirt_support.option.question
+    csirt_support.option.question = create_question("FREETEXT", "UNRELATED", "Describe the incident")
+    csirt_support.option.save()
+    submit_answer(csirt_support.incident, csirt_support.option, text="Unrelated old answer")
+    csirt_support.option.question = support_question
+    csirt_support.option.save()
+
+    filtered = IncidentFilter(queryset=Incident.objects.all())
+
+    assert filtered.qs.get(pk=csirt_support.incident.pk).csirt_support_answer_id is None
+
+
+@pytest.mark.django_db
+def test_support_answer_uses_the_first_question_snapshot_after_its_timestamp(csirt_support):
+    support_question = csirt_support.option.question
+    submitted = submit_answer(csirt_support.incident, csirt_support.option, csirt_support.yes)
+    csirt_support.option.question = create_question("FREETEXT", "UNRELATED", "Describe the incident")
+    csirt_support.option.save()
+    submit_answer(csirt_support.other_incident, csirt_support.option, text="Unrelated intermediate answer")
+    csirt_support.option.question = support_question
+    csirt_support.option.save()
+    csirt_support.option.position += 1
+    csirt_support.option.save()
+
+    filtered = IncidentFilter({"csirt_support": csirt_support.yes.pk}, queryset=Incident.objects.all())
+
+    assert filtered.qs.get().csirt_support_answer_id == submitted.pk
+    assert IncidentFilter(queryset=Incident.objects.all()).qs.get(pk=csirt_support.other_incident.pk).csirt_support_answer_id is None
+
+
+@pytest.mark.django_db
+def test_support_answers_after_reassignment_use_the_current_question(csirt_support):
+    support_question = csirt_support.option.question
+    csirt_support.option.question = create_question("FREETEXT", "UNRELATED", "Describe the incident")
+    csirt_support.option.save()
+    submit_answer(csirt_support.incident, csirt_support.option, text="Unrelated old answer")
+    csirt_support.option.question = support_question
+    csirt_support.option.save()
+    submitted = submit_answer(csirt_support.incident, csirt_support.option, csirt_support.yes)
+
+    filtered = IncidentFilter({"csirt_support": csirt_support.yes.pk}, queryset=Incident.objects.all())
+
+    assert filtered.qs.get().csirt_support_answer_id == submitted.pk
 
 
 @pytest.mark.django_db
@@ -123,9 +190,13 @@ def test_support_filter_works_without_the_configured_question():
 
 
 @pytest.mark.django_db
-def test_dashboard_displays_the_latest_support_answer_and_escapes_details(otp_client, csirt_support):
+@pytest.mark.parametrize("reassign_question", [False, True])
+def test_dashboard_displays_the_latest_support_answer_and_escapes_details(otp_client, csirt_support, reassign_question):
     submit_answer(csirt_support.incident, csirt_support.option, csirt_support.no)
     latest = submit_answer(csirt_support.incident, csirt_support.option, csirt_support.yes, text="<script>alert(1)</script>")
+    if reassign_question:
+        csirt_support.option.question = create_question("FREETEXT", "UNRELATED", "Describe the incident")
+        csirt_support.option.save()
     regulator = next(user for user in csirt_support.users if user.email == "regadmin@reg1.lu")
 
     response = otp_client(regulator).get(reverse("incidents"))

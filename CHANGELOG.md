@@ -11,7 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- The incident dashboard shows the latest submitted answer to the CSIRT support question (reference `8`) in a "Support required from national CSIRT" column, with a filter for its predefined answers.
+- The incident dashboard shows the latest submitted answer to the CSIRT support question (reference `8`) in a "Support required from national CSIRT" column, with a filter for its predefined answers. Question history preserves the meaning of submitted answers when questionnaire options are reassigned.
 - Opt-in read-only APIs for incidents, security-objective declarations, reporting projects and the current user, with expiring personal API keys stored as hashes, account-based key creation/revocation, OpenAPI YAML and Swagger UI. The API is disabled by default; once enabled, platform administrators grant it per module and role under **API access**, and it follows the key owner's current organization, sector and module permissions.
 
 ### Changed

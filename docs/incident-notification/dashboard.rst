@@ -134,7 +134,7 @@ Due to the complexity of the screen, its different parts will be presented one b
       * - 12
         - Support required from national CSIRT
         - Yes
-        - The latest submitted answer to question reference ``8``, including any additional text. **Not answered** means no submitted answer is available. Draft answers are not shown, and older submitted answers do not match the filter once a newer answer has been submitted.
+        - The latest submitted answer to question reference ``8``, including any additional text. **Not answered** means no submitted answer is available. Draft answers are not shown, and older submitted answers do not match the filter once a newer answer has been submitted. The question is identified from its version at the time of the answer, so reassigning a questionnaire option does not change the meaning of existing answers.
       * - 13
         - Actions
         - Always
