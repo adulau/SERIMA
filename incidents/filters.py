@@ -1,5 +1,6 @@
 import django_filters
-from django.db.models import Q
+from django.db.models import F, OuterRef, Q, QuerySet, Subquery
+from django.db.models.functions import Coalesce
 from django.utils.translation import gettext_lazy as _
 
 from governanceplatform.helpers import get_sectors_grouped, normalize_reference
@@ -7,7 +8,7 @@ from governanceplatform.models import Sector
 
 from .forms import DropdownCheckboxSelectMultiple
 from .globals import REFERENCE_PREFIX
-from .models import Incident, SectorRegulation
+from .models import Answer, Incident, PredefinedAnswer, QuestionOptionsHistory, SectorRegulation
 
 
 # define specific query to get the regulation
@@ -30,6 +31,11 @@ class IncidentFilter(django_filters.FilterSet):
     incident_id = django_filters.CharFilter(method="filter_reference")
     affected_sectors = django_filters.MultipleChoiceFilter(widget=DropdownCheckboxSelectMultiple(), label=_("Sectors"))
     sector_regulation = django_filters.ModelChoiceFilter(queryset=sector_regulation)
+    csirt_support = django_filters.ModelChoiceFilter(
+        queryset=PredefinedAnswer.objects.filter(question__reference="8").prefetch_related("translations").order_by("position", "pk"),
+        method="filter_csirt_support",
+        label=_("Support required from national CSIRT"),
+    )
 
     search = django_filters.CharFilter(method="filter_search", label=_("Search"))
 
@@ -37,6 +43,22 @@ class IncidentFilter(django_filters.FilterSet):
         super().__init__(*args, **kwargs)
         grouped_choices = get_sectors_grouped(Sector.objects.all())
         self.filters["affected_sectors"].field.choices = grouped_choices
+        # Snapshots store the pre-edit state, so the first later edit identifies the answered question.
+        question_at_answer_time = QuestionOptionsHistory.objects.filter(
+            questionoptions=OuterRef("question_options_id"), timestamp__gte=OuterRef("timestamp")
+        ).order_by("timestamp", "pk")
+        latest_support_answer = (
+            Answer.objects.filter(incident_workflow__incident=OuterRef("pk"))
+            .annotate(
+                question_reference=Coalesce(
+                    Subquery(question_at_answer_time.values("question__reference")[:1]), F("question_options__question__reference")
+                )
+            )
+            .filter(question_reference="8")
+            .exclude(incident_workflow__review_status__in=["UNDE", "OUT"])
+            .order_by("-incident_workflow__timestamp", "-incident_workflow_id", "-timestamp", "-pk")
+        )
+        self.queryset = self.queryset.annotate(csirt_support_answer_id=Subquery(latest_support_answer.values("pk")[:1]))
 
     class Meta:
         model = Incident
@@ -50,6 +72,9 @@ class IncidentFilter(django_filters.FilterSet):
 
     def filter_reference(self, queryset, name, value):
         return queryset.filter(reference_matches(value))
+
+    def filter_csirt_support(self, queryset: QuerySet[Incident], name: str, value: PredefinedAnswer) -> QuerySet[Incident]:
+        return queryset.filter(csirt_support_answer_id__in=Answer.objects.filter(predefined_answers=value).values("pk"))
 
     def filter_search(self, queryset, name, value):
         return queryset.filter(
