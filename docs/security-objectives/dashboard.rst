@@ -101,7 +101,7 @@ Its parts are numbered in the screenshot below and described one by one.
         - The year the declaration is for.
       * - 8
         - Progress
-        - How much of the declaration has been filled in. At 100 %, an unsubmitted declaration shows a **Submit** button here instead.
+        - How much of the declaration has been filled in. At 100 %, an unsubmitted declaration with no objective still marked for revision shows a **Submit** button here instead.
       * - 9
         - Actions
         - The actions on the declaration, described in points 8 to 13.
@@ -111,7 +111,7 @@ Its parts are numbered in the screenshot below and described one by one.
 
    .. important::
 
-      Once a declaration is complete, a **Submit** button replaces its progress bar: click it to submit the declaration.
+      Once a declaration is complete, and none of its objectives is still marked for revision, a **Submit** button replaces its progress bar: click it to submit the declaration.
       The declaration screen has its own **Submit** button (see :doc:`fill-in-a-declaration`).
 
 7. **Column settings**: The white gear icon on a red background opens the **Choice of columns** pop-up.
@@ -158,6 +158,9 @@ Points 8 to 13 are the actions of each declaration, in the order they appear in 
 
 11. **Download**: Downloads the declaration as a PDF document. Until the regulator sends the result of the review,
     the PDF shows the status **Under review**, without the results of the objectives or the review comments.
+    As in the declaration, the objectives are listed domain by domain, each under a line naming its domain and its
+    place in it, for example *D2 · Access control · Objective 3 of 5 in this domain*. A framework with a single
+    domain shows no such line.
 
 12. **Delete**: Deletes the declaration. Only unsubmitted declarations can be deleted; for the others, the icon is greyed out.
 

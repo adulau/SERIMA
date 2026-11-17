@@ -16,7 +16,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- The objective selector of a security objectives declaration is now grouped by the domains of the evaluation framework, each labelled D1, D2… from its position, and the objectives are numbered domain by domain. When the selector is too narrow for every objective, the other domains collapse to their code and one symbol summing up their objectives, which shows their name and the count of objectives in each state on hover and opens their first objective still to fill or to review on click; if the current domain still does not fit, its objectives are shown a page at a time. A line above each objective names its domain and its place in it; the PDF of the declaration shows the same line and lists the objectives in the same order, domain by domain. A declaration now opens on the first objective still to fill (operators) or to review (regulators) instead of the first one (#925)
+
 - On the security objectives dashboard, the button that starts a declaration is now "New assessment" instead of "New submission", and an empty dashboard now reads "No security objectives statements have been created yet." instead of "…submitted yet." (#934)
+
+- On the security objectives logs, show all the actions for all the versions of the submission. (#951)
+
+- The header of an incident report and of a security objectives declaration now shows the **Reference** of the incident or declaration. Operators no longer see the **Company** there, nor the contact icon, which only regulators (and, for incidents, observers) still have (#942)
+
+### Fixed
+
+- Adding a user in the administration interface with the email address of an existing account written in a different case (e.g. `Jane.Doe@…` for `jane.doe@…`) now shows "An account with this email address already exists." instead of an error page
+
+- Security objectives framework CSV exports from the administration interface and declaration mass exports from the dashboard now include a UTF-8 byte order mark, so spreadsheet applications display accented headers and data correctly (#953)
+
+- An operator who updated a security objectives declaration still under review got a new version carrying the regulator's unsent review, so the objective selector showed the objectives the regulator had marked for revision, and the **Previous version** pop-up showed the regulator's draft comments. A version updated before the review is sent now starts with every objective not reviewed and no review comment, and the previous version's review comments are shown only once that review is sent (#931)
+
+- A regulator could keep reviewing a security objectives declaration after the operator had submitted a newer version of it, and send the verdict on the older one, which then took the newer version's place on both dashboards, so the newer version was never reviewed. Once a newer version is submitted, the older one can no longer be reviewed, commented on or sent: it shows a banner linking to the newer version, and the dashboards, the export, the version list and **Duplicate** now take the most recently created version instead of the most recently updated one. Only the latest version of a declaration can be updated, and a submission and the sending of a review on the same declaration no longer overlap, so a review sent while the operator submits a newer version is refused (#931)
+
+- The security objectives dashboard offered to submit a fully filled declaration that still had an objective marked for revision, and the submission went through, while the declaration screen kept its Submit button disabled. A declaration can now be submitted only once every objective is fully filled and none is still marked for revision, from the dashboard as from the declaration screen
+
+
+- The referrer policy set in the configuration was ignored, because the setting was named `REFERRER_POLICY` instead of Django's `SECURE_REFERRER_POLICY`, so pages were always sent with Django's default `Referrer-Policy: same-origin`. That remains the default, and `SECURE_REFERRER_POLICY` in `config.py` now changes it. Rename `REFERRER_POLICY` to `SECURE_REFERRER_POLICY` in an existing `config.py`, as the old name is no longer read (#613)
+
+### Added
+
+- A table of contents button beside the Icon Guide of a security objectives declaration opens a side panel with the number of objectives in each state, and every domain with its objectives, their state and how many of them are filled (operators) or reviewed (regulators); clicking an objective opens it. Unlike the objective selector, it is available on every screen size (#925)
+
 
 ## [0.6.1] - 2026-10-27
 
